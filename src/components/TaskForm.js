@@ -59,13 +59,19 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
                     required
                 />
             </div>
-            <div className="col-md-2">
-                <button type="submit" className="btn btn-success w-100">
-                    {updateIndex >= 0 ? 'Actualizar' : 'Agregar'}
-                </button>
-            </div>
-        </form>
-    );
-};
+                            <div className="col-md-2 d-flex">
+                                <button type="submit" className="btn btn-success me-2">
+                                    {updateIndex >= 0 ? 'Actualizar' : 'Agregar'}
+                                </button>
+                                <button type="button" className="btn btn-success w-100" onClick={() => setShowAnalitica(true)}>
+                                    Analítica
+                                </button>
+                            </div>
+                        </form>
 
-export default TaskForm;
+                        {showAnalitica && <AnaliticaModal onClose={() => setShowAnalitica(false)} />}
+                    </>
+                );
+            };
+
+            export default TaskForm;
