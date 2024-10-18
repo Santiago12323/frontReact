@@ -40,6 +40,11 @@ jobs:
           name: react-build
           path: ./build
 
+      - name: 'Log in to Azure'
+        uses: azure/login@v1
+        with:
+          credentials: ${{ secrets.AZURE_CREDENTIALS }}
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
