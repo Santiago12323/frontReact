@@ -4,8 +4,7 @@ import React from 'react';
 const AnaliticaModal = ({ onClose }) => {
     const mostrarGrafico = (tipo) => {
         console.log(`Mostrando gráfico: ${tipo}`);
-        // Aquí puedes agregar la lógica para mostrar el gráfico correspondiente
-        onClose(); // Cierra el modal después de seleccionar
+        onClose(); 
     };
 
     return (
