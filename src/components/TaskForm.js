@@ -70,7 +70,6 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
                         </form>
 
                         {showAnalitica && <AnaliticaModal onClose={() => setShowAnalitica(false)} />}
-                    </>
                 );
             };
 
