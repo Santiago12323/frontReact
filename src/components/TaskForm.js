@@ -5,7 +5,7 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
     const [taskName, setTaskName] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
     const [showAnalitica, setShowAnalitica] = useState(false); // Estado para mostrar el modal
-
+    //e
     // Efecto para manejar el llenado del formulario al editar
     useEffect(() => {
         if (taskToUpdate) {
