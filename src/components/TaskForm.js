@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import AnaliticaModal from './AnaliticaModal'; // Asegúrate de importar tu componente Modal
 
 const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
     const [taskName, setTaskName] = useState('');
     const [taskDescription, setTaskDescription] = useState('');
+    const [showAnalitica, setShowAnalitica] = useState(false); // Estado para mostrar el modal
 
     // Efecto para manejar el llenado del formulario al editar
     useEffect(() => {
@@ -59,18 +61,16 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
                     required
                 />
             </div>
-                            <div className="col-md-2 d-flex">
-                                <button type="submit" className="btn btn-success me-2">
-                                    {updateIndex >= 0 ? 'Actualizar' : 'Agregar'}
-                                </button>
-                                <button type="button" className="btn btn-success w-100" onClick={() => setShowAnalitica(true)}>
-                                    Analítica
-                                </button>
-                            </div>
-                        </form>
+            <div className="col-md-2 d-flex">
+                <button type="submit" className="btn btn-success me-2">
+                    {updateIndex >= 0 ? 'Actualizar' : 'Agregar'}
+                </button>
+                <button type="button" className="btn btn-success w-100" onClick={() => setShowAnalitica(true)}>
+                    Analítica
+                </button>
+            </div>
+        </form>
+    );
+};
 
-                        {showAnalitica && <AnaliticaModal onClose={() => setShowAnalitica(false)} />}
-                );
-            };
-
-            export default TaskForm;
+export default TaskForm;
