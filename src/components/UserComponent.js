@@ -5,6 +5,8 @@ const UserComponent = () => {
     const [showSignupForm, setShowSignupForm] = useState(false);
     const [loginMessage, setLoginMessage] = useState('');
     const [signupMessage, setSignupMessage] = useState('');
+    const [notificationVisible, setNotificationVisible] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState('');
 
     const handleLoginToggle = () => {
         setShowLoginForm(!showLoginForm);
@@ -48,8 +50,19 @@ const UserComponent = () => {
                 <div className="modal show">
                     <div className="modal-content">
                         <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
-                        <SignupForm setSignupMessage={setSignupMessage} />
+                        <SignupForm setSignupMessage={setSignupMessage} 
+                        setNotificationVisible={setNotificationVisible}
+                        setNotificationMessage={setNotificationMessage} />
                         {signupMessage && <p>{signupMessage}</p>}
+                    </div>
+                </div>
+            )}
+
+            {notificationVisible && (
+                <div className="modal show">
+                    <div className="modal-content">
+                        <button onClick={() => setNotificationVisible(false)} className="btn btn-danger close_button">Cerrar</button>
+                        <p>{notificationMessage}</p>
                     </div>
                 </div>
             )}
@@ -105,9 +118,10 @@ const LoginForm = ({ setLoginMessage }) => {
     );
 };
 
-const SignupForm = ({ setSignupMessage }) => {
+const SignupForm = ({ setSignupMessage, setNotificationVisible, setNotificationMessage }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSignupSubmit = async (e) => {
         e.preventDefault();
@@ -117,18 +131,22 @@ const SignupForm = ({ setSignupMessage }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ password,username}),
+                body: JSON.stringify({ nombre: username, contraseña :password}),
             });
 
             const success = await response.json(); 
 
             if (response.ok && success) {
-                setSignupMessage('Registro exitoso');
+                setNotificationMessage('Registro exitoso');
             } else {
-                setSignupMessage('Error en el registro');
+                const errorMessage = await response.text();
+                setErrorMessage(errorMessage);
+                setNotificationMessage(`Error en el registro: ${errorMessage}`);
             }
         } catch (error) {
-            setSignupMessage('Error en la conexión con el servidor');
+            setNotificationMessage('Error en la conexión con el servidor');
+        } finally {
+            setNotificationVisible(true);
         }
     };
 
@@ -156,6 +174,7 @@ const SignupForm = ({ setSignupMessage }) => {
                 />
             </div>
             <button type="submit" className="btn btn-success">Registrar</button>
+            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Muestra el mensaje de error */}
         </form>
     );
 };
