@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskTable from './components/TaskTable';
 import TaskForm from './components/TaskForm';
+import UserComponent from './components/UserComponent';
 import './style.css';
 
 const App = () => {
@@ -113,6 +114,8 @@ const App = () => {
             <div className="text-center mb-4">
                 <h1 id="titulo">Tareas</h1>
             </div>
+
+            <UserComponent/>
 
             <TaskForm
                 addTask={addTask}
