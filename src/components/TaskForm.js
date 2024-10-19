@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import AnaliticaModal from './AnaliticaModal'; // Asegúrate de importar tu componente Modal
+import Analitica from './Analitica'; 
 
 const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
     const [taskName, setTaskName] = useState('');
