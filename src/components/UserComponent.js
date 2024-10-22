@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 
-const UserComponent = () => {
+const UserComponent = ({ setTasks }) => {
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showSignupForm, setShowSignupForm] = useState(false);
     const [notificationVisible, setNotificationVisible] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
     const [notificationType, setNotificationType] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('');
 
     const handleLoginToggle = () => {
         setShowLoginForm(!showLoginForm);
@@ -38,6 +39,11 @@ const UserComponent = () => {
                 setNotificationType('success');
                 setIsLoggedIn(true);
                 setShowLoginForm(false);
+                setUsername(username);
+
+                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/tareas/${username}`);
+                const userTasks = await tasksResponse.json();
+                setTasks(userTasks); 
             } else {
                 const errorMessage = success.message || 'Error en el inicio de sesión';
                 setNotificationMessage(errorMessage);
@@ -77,42 +83,47 @@ const UserComponent = () => {
                 setNotificationType('error');
             }
         } catch (error) {
-            setNotificationMessage('Exitoso Usuario creado');
+            setNotificationMessage('Usuario creado');
             setNotificationVisible(true);
-            setShowSignupForm(false); 
+            setShowSignupForm(false);
         } finally {
             setNotificationVisible(true);
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setIsLoggedIn(false);
         setNotificationVisible(false);
+
+        // Restablece la URL y obtiene todas las tareas
+        const tasksResponse = await fetch('https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/tareas');
+        const allTasks = await tasksResponse.json();
+        setTasks(allTasks); // Actualiza las tareas en el componente App
     };
 
     return (
         <div className="user-component d-flex justify-content-between align-items-center">
-            {!isLoggedIn && (
-                <>
-                    <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
-                        Iniciar Sesión
-                    </button>
-                    <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
-                        Crear Cuenta
-                    </button>
-                </>
-            )}
-
-            {isLoggedIn && (
-                <div className="d-flex align-items-center">
-                    <div className={`notification ${notificationType} me-3`} style={{ textAlign: 'left' }}>
-                        {notificationMessage}
-                    </div>
-                    <button className="btn btn-danger btn-sm" onClick={handleLogout}>
-                        Cerrar Sesión
-                    </button>
-                </div>
-            )}
+            <div className="d-flex align-items-center">
+                {!isLoggedIn ? (
+                    <>
+                        <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
+                            Iniciar Sesión
+                        </button>
+                        <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
+                            Crear Cuenta
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <div className={`notification ${notificationType} me-3`} style={{ textAlign: 'left' }}>
+                            {notificationMessage}
+                        </div>
+                        <button className="btn btn-danger btn-sm" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
+                    </>
+                )}
+            </div>
 
             {notificationVisible && !isLoggedIn && (
                 <div className={`notification ${notificationType} me-3`}>
