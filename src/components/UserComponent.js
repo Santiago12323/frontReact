@@ -1,85 +1,173 @@
 import React, { useState } from 'react';
 
-const UserComponent = () => {
+const UserComponent = ({ setTasks }) => {
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showSignupForm, setShowSignupForm] = useState(false);
+    const [notificationVisible, setNotificationVisible] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState('');
+    const [notificationType, setNotificationType] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('');
 
     const handleLoginToggle = () => {
         setShowLoginForm(!showLoginForm);
-        setShowSignupForm(false); // Oculta el registro si muestra el inicio de sesión
+        setShowSignupForm(false);
     };
 
     const handleSignupToggle = () => {
         setShowSignupForm(!showSignupForm);
-        setShowLoginForm(false); // Oculta el inicio de sesión si muestra el registro
+        setShowLoginForm(false);
     };
 
     const handleClose = () => {
-            setShowLoginForm(false);
+        setShowLoginForm(false);
+        setShowSignupForm(false);
+        setNotificationVisible(false);
+    };
+
+    const handleLoginSubmit = async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        try {
+            const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/${username}/${password}`);
+            const success = await response.json();
+
+            if (response.ok && success) {
+                setNotificationMessage('Inicio de sesión exitoso');
+                setNotificationType('success');
+                setIsLoggedIn(true);
+                setShowLoginForm(false);
+                setUsername(username);
+
+                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/tareas/${username}`);
+                const userTasks = await tasksResponse.json();
+                setTasks(userTasks); 
+            } else {
+                const errorMessage = success.message || 'Error en el inicio de sesión';
+                setNotificationMessage(errorMessage);
+                setNotificationType('error');
+            }
+        } catch (error) {
+            setNotificationMessage('Error en la conexión con el servidor');
+            setNotificationType('error');
+        } finally {
+            setNotificationVisible(true);
+        }
+    };
+
+    const handleSignupSubmit = async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
+        try {
+            const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nombre: username, contraseña: password }),
+            });
+
+            const success = await response.json();
+
+            if (response.ok) {
+                setNotificationMessage('Registro exitoso');
+                setNotificationType('success');
+                setShowSignupForm(false); 
+            } else {
+                const errorMessage = success.message || 'Error en el registro';
+                setNotificationMessage(errorMessage);
+                setNotificationType('error');
+            }
+        } catch (error) {
+            setNotificationMessage('Usuario creado');
+            setNotificationVisible(true);
             setShowSignupForm(false);
+        } finally {
+            setNotificationVisible(true);
+        }
+    };
+
+    const handleLogout = async () => {
+        setIsLoggedIn(false);
+        setNotificationVisible(false);
+
+        // Restablece la URL y obtiene todas las tareas
+        const tasksResponse = await fetch('https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/tareas');
+        const allTasks = await tasksResponse.json();
+        setTasks(allTasks); // Actualiza las tareas en el componente App
     };
 
     return (
-        <div className="user-component d-flex justify-content-end">
-            <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
-                Iniciar Sesión
-            </button>
-            <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
-                Crear Cuenta
-            </button>
-            <button className="btn btn-danger" onClick={handleSignupToggle}>
-                Cerrar Sesión
-            </button>
+        <div className="user-component d-flex justify-content-between align-items-center">
+            <div className="d-flex align-items-center">
+                {!isLoggedIn ? (
+                    <>
+                        <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
+                            Iniciar Sesión
+                        </button>
+                        <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
+                            Crear Cuenta
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <div className={`notification ${notificationType} me-3`} style={{ textAlign: 'left' }}>
+                            {notificationMessage}
+                        </div>
+                        <button className="btn btn-danger btn-sm" onClick={handleLogout}>
+                            Cerrar Sesión
+                        </button>
+                    </>
+                )}
+            </div>
 
-             {showLoginForm && (
-                            <div className="modal show">
-                                <div className="modal-content">
-                                    <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
-                                    <LoginForm />
-                                </div>
+            {notificationVisible && !isLoggedIn && (
+                <div className={`notification ${notificationType} me-3`}>
+                    {notificationMessage}
+                </div>
+            )}
+
+            {showLoginForm && (
+                <div className="modal show">
+                    <div className="modal-content">
+                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
+                        <form className="mt-4" onSubmit={handleLoginSubmit}>
+                            <h4>Iniciar Sesión</h4>
+                            <div className="mb-3">
+                                <input type="text" name="username" className="form-control" placeholder="Nombre de usuario" required />
                             </div>
-             )}
+                            <div className="mb-3">
+                                <input type="password" name="password" className="form-control" placeholder="Contraseña" required />
+                            </div>
+                            <button type="submit" className="btn btn-success">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {showSignupForm && (
-                            <div className="modal show">
-                                <div className="modal-content">
-                                    <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
-                                    <SignupForm />
-                                </div>
+                <div className="modal show">
+                    <div className="modal-content">
+                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
+                        <form className="mt-4" onSubmit={handleSignupSubmit}>
+                            <h4>Crear Cuenta</h4>
+                            <div className="mb-3">
+                                <input type="text" name="username" className="form-control" placeholder="Nombre de usuario" required />
                             </div>
+                            <div className="mb-3">
+                                <input type="password" name="password" className="form-control" placeholder="Contraseña" required />
+                            </div>
+                            <button type="submit" className="btn btn-success">Registrar</button>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );
 };
 
-const LoginForm = () => {
-    return (
-        <form className="mt-4">
-            <h4>Iniciar Sesión</h4>
-            <div className="mb-3">
-                <input type="text" className="form-control" placeholder="Nombre de usuario" required />
-            </div>
-            <div className="mb-3">
-                <input type="password" className="form-control" placeholder="Contraseña" required />
-            </div>
-            <button type="submit" className="btn btn-success">Entrar</button>
-        </form>
-    );
-};
-
-const SignupForm = () => {
-    return (
-        <form className="mt-4">
-            <h4>Crear Cuenta</h4>
-            <div className="mb-3">
-                <input type="text" className="form-control" placeholder="Nombre de usuario" required />
-            </div>
-            <div className="mb-3">
-                <input type="password" className="form-control" placeholder="Contraseña" required />
-            </div>
-            <button type="submit" className="btn btn-success">Registrar</button>
-        </form>
-    );
-};
-
 export default UserComponent;
-

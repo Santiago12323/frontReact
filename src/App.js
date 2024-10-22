@@ -6,10 +6,9 @@ import './style.css';
 
 const App = () => {
     const [tasks, setTasks] = useState([]);
-    const [updateIndex, setUpdateIndex] = useState(-1); // Para identificar cuál se está actualizando
+    const [updateIndex, setUpdateIndex] = useState(-1); 
     const apiUrl = 'https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/tareas';
 
-    // Fetch para obtener las tareas desde la API
     const fetchTasks = async () => {
         try {
             const response = await fetch(apiUrl);
@@ -40,26 +39,23 @@ const App = () => {
                 throw new Error(`Error: ${response.statusText}`);
             }
             const data = await response.json();
-            setTasks([...tasks, data]);
+            setTasks((prevTasks) => [...prevTasks, data]);
         } catch (error) {
             console.error("Error adding task", error);
         }
     };
 
-    
     const deleteTask = async (taskId) => {
         try {
             await fetch(`${apiUrl}/${taskId}`, {
                 method: 'DELETE',
             });
-            const updatedTasks = tasks.filter(task => task.id !== taskId); // Filtra la tarea por id
-            setTasks(updatedTasks);
+            setTasks((prevTasks) => prevTasks.filter(task => task.id !== taskId)); 
         } catch (error) {
             console.error("Error deleting task", error);
         }
     };
 
-  
     const editTask = (index) => {
         setUpdateIndex(index);
     };
@@ -74,8 +70,9 @@ const App = () => {
                 },
                 body: JSON.stringify(updatedTask),
             });
-            const updatedTasks = tasks.map(task => (task.id === taskId ? { ...task, ...updatedTask } : task));
-            setTasks(updatedTasks);
+            setTasks((prevTasks) =>
+                prevTasks.map(task => (task.id === taskId ? { ...task, ...updatedTask } : task))
+            );
             setUpdateIndex(-1);
         } catch (error) {
             console.error("Error updating task", error);
@@ -83,31 +80,27 @@ const App = () => {
     };
 
     const toggleTaskStatus = async (taskId) => {
-      try {
-          const response = await fetch(`${apiUrl}/cambio/${taskId}`, {
-              method: 'GET', // Cambia a GET
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-          });
-  
-          if (!response.ok) {
-              throw new Error(`Error: ${response.statusText}`);
-          }
-  
-          // Después de hacer la llamada, actualiza el estado de la tarea localmente
-          const updatedTasks = tasks.map(task => 
-              task.id === taskId ? { ...task, completed: !task.completed } : task
-          );
-          setTasks(updatedTasks);
-      } catch (error) {
-          console.error("Error toggling task status", error);
-      }
-  };
-  
-  
+        try {
+            const response = await fetch(`${apiUrl}/cambio/${taskId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
 
-    const taskToUpdate = updateIndex >= 0 ? tasks[updateIndex] : null;
+            if (!response.ok) {
+                throw new Error(`Error: ${response.statusText}`);
+            }
+
+            setTasks((prevTasks) =>
+                prevTasks.map(task =>
+                    task.id === taskId ? { ...task, completed: !task.completed } : task
+                )
+            );
+        } catch (error) {
+            console.error("Error toggling task status", error);
+        }
+    };
 
     return (
         <div className="container mt-5">
@@ -115,13 +108,13 @@ const App = () => {
                 <h1 id="titulo">Tareas</h1>
             </div>
 
-            <UserComponent/>
+            <UserComponent setTasks={setTasks} />
 
             <TaskForm
                 addTask={addTask}
                 updateTask={updateTask}
                 updateIndex={updateIndex}
-                taskToUpdate={taskToUpdate}
+                taskToUpdate={tasks[updateIndex]}
             />
 
             <TaskTable 
