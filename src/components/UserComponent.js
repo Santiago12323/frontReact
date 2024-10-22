@@ -3,10 +3,10 @@ import React, { useState } from 'react';
 const UserComponent = () => {
     const [showLoginForm, setShowLoginForm] = useState(false);
     const [showSignupForm, setShowSignupForm] = useState(false);
-    const [loginMessage, setLoginMessage] = useState('');
-    const [signupMessage, setSignupMessage] = useState('');
     const [notificationVisible, setNotificationVisible] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState('');
+    const [notificationType, setNotificationType] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     const handleLoginToggle = () => {
         setShowLoginForm(!showLoginForm);
@@ -21,161 +21,140 @@ const UserComponent = () => {
     const handleClose = () => {
         setShowLoginForm(false);
         setShowSignupForm(false);
-        setLoginMessage('');
-        setSignupMessage('');
+        setNotificationVisible(false);
     };
-
-    return (
-        <div className="user-component d-flex justify-content-end">
-            <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
-                Iniciar Sesión
-            </button>
-            <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
-                Crear Cuenta
-            </button>
-            <button className="btn btn-danger" onClick={handleClose}>
-                Cerrar Sesión
-            </button>
-
-            {showLoginForm && (
-                <div className="modal show">
-                    <div className="modal-content">
-                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
-                        <LoginForm setLoginMessage={setLoginMessage} />
-                        {loginMessage && <p>{loginMessage}</p>}
-                    </div>
-                </div>
-            )}
-            {showSignupForm && (
-                <div className="modal show">
-                    <div className="modal-content">
-                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
-                        <SignupForm setSignupMessage={setSignupMessage} 
-                        setNotificationVisible={setNotificationVisible}
-                        setNotificationMessage={setNotificationMessage} />
-                        {signupMessage && <p>{signupMessage}</p>}
-                    </div>
-                </div>
-            )}
-
-            {notificationVisible && (
-                <div className="modal show">
-                    <div className="modal-content">
-                        <button onClick={() => setNotificationVisible(false)} className="btn btn-danger close_button">Cerrar</button>
-                        <p>{notificationMessage}</p>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
-const LoginForm = ({ setLoginMessage }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
 
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
         try {
             const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/${username}/${password}`);
-            const success = await response.json(); 
+            const success = await response.json();
 
             if (response.ok && success) {
-                setLoginMessage('Inicio de sesión exitoso');
+                setNotificationMessage('Inicio de sesión exitoso');
+                setNotificationType('success');
+                setIsLoggedIn(true);
+                setShowLoginForm(false);
             } else {
-                setLoginMessage('Error en el inicio de sesión');
+                const errorMessage = success.message || 'Error en el inicio de sesión';
+                setNotificationMessage(errorMessage);
+                setNotificationType('error');
             }
         } catch (error) {
-            setLoginMessage('Error en la conexión con el servidor');
+            setNotificationMessage('Error en la conexión con el servidor');
+            setNotificationType('error');
+        } finally {
+            setNotificationVisible(true);
         }
     };
 
-    return (
-        <form className="mt-4" onSubmit={handleLoginSubmit}>
-            <h4>Iniciar Sesión</h4>
-            <div className="mb-3">
-                <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Nombre de usuario" 
-                    value={username} 
-                    onChange={(e) => setUsername(e.target.value)} 
-                    required 
-                />
-            </div>
-            <div className="mb-3">
-                <input 
-                    type="password" 
-                    className="form-control" 
-                    placeholder="Contraseña" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                />
-            </div>
-            <button type="submit" className="btn btn-success">Entrar</button>
-        </form>
-    );
-};
-
-const SignupForm = ({ setSignupMessage, setNotificationVisible, setNotificationMessage }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
-
     const handleSignupSubmit = async (e) => {
         e.preventDefault();
+        const username = e.target.username.value;
+        const password = e.target.password.value;
+
         try {
             const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ nombre: username, contraseña :password}),
+                body: JSON.stringify({ nombre: username, contraseña: password }),
             });
 
-            const success = await response.json(); 
+            const success = await response.json();
 
-            if (response.ok && success) {
+            if (response.ok) {
                 setNotificationMessage('Registro exitoso');
-            } else {
-                const errorMessage = await response.text();
-                setErrorMessage(errorMessage);
-                setNotificationMessage(`Error en el registro: ${errorMessage}`);
+                setNotificationType('success');
+                setShowSignupForm(false); 
+                const errorMessage = success.message || 'Error en el registro';
+                setNotificationMessage(errorMessage);
+                setNotificationType('error');
             }
         } catch (error) {
-            setNotificationMessage('Error en la conexión con el servidor');
+            setNotificationMessage('Usuario creado');
+            setNotificationVisible(true);
+            setShowSignupForm(false)
         } finally {
             setNotificationVisible(true);
         }
     };
 
+    const handleLogout = () => {
+        setIsLoggedIn(false);
+        setNotificationVisible(false);
+    };
+
     return (
-        <form className="mt-4" onSubmit={handleSignupSubmit}>
-            <h4>Crear Cuenta</h4>
-            <div className="mb-3">
-                <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Nombre de usuario" 
-                    value={username} 
-                    onChange={(e) => setUsername(e.target.value)} 
-                    required 
-                />
-            </div>
-            <div className="mb-3">
-                <input 
-                    type="password" 
-                    className="form-control" 
-                    placeholder="Contraseña" 
-                    value={password} 
-                    onChange={(e) => setPassword(e.target.value)} 
-                    required 
-                />
-            </div>
-            <button type="submit" className="btn btn-success">Registrar</button>
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>} {/* Muestra el mensaje de error */}
-        </form>
+        <div className="user-component d-flex justify-content-between align-items-center">
+            {!isLoggedIn && (
+                <>
+                    <button className="btn btn-primary me-2" onClick={handleLoginToggle}>
+                        Iniciar Sesión
+                    </button>
+                    <button className="btn btn-secondary me-2" onClick={handleSignupToggle}>
+                        Crear Cuenta
+                    </button>
+                </>
+            )}
+
+            {isLoggedIn && (
+                <div className="d-flex align-items-center">
+                    <div className={`notification ${notificationType} me-3`} style={{ textAlign: 'left' }}>
+                        {notificationMessage}
+                    </div>
+                    <button className="btn btn-danger btn-sm" onClick={handleLogout}>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            )}
+
+            {notificationVisible && !isLoggedIn && (
+                <div className={`notification ${notificationType} me-3`}>
+                    {notificationMessage}
+                </div>
+            )}
+
+            {showLoginForm && (
+                <div className="modal show">
+                    <div className="modal-content">
+                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
+                        <form className="mt-4" onSubmit={handleLoginSubmit}>
+                            <h4>Iniciar Sesión</h4>
+                            <div className="mb-3">
+                                <input type="text" name="username" className="form-control" placeholder="Nombre de usuario" required />
+                            </div>
+                            <div className="mb-3">
+                                <input type="password" name="password" className="form-control" placeholder="Contraseña" required />
+                            </div>
+                            <button type="submit" className="btn btn-success">Entrar</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {showSignupForm && (
+                <div className="modal show">
+                    <div className="modal-content">
+                        <button onClick={handleClose} className="btn btn-danger close_button">Cerrar</button>
+                        <form className="mt-4" onSubmit={handleSignupSubmit}>
+                            <h4>Crear Cuenta</h4>
+                            <div className="mb-3">
+                                <input type="text" name="username" className="form-control" placeholder="Nombre de usuario" required />
+                            </div>
+                            <div className="mb-3">
+                                <input type="password" name="password" className="form-control" placeholder="Contraseña" required />
+                            </div>
+                            <button type="submit" className="btn btn-success">Registrar</button>
+                        </form>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
