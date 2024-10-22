@@ -70,15 +70,15 @@ const UserComponent = () => {
             if (response.ok) {
                 setNotificationMessage('Registro exitoso');
                 setNotificationType('success');
-                setShowSignupForm(false); 
+                setShowSignupForm(false); // Cerrar el formulario de registro después del registro exitoso
+            } else {
                 const errorMessage = success.message || 'Error en el registro';
                 setNotificationMessage(errorMessage);
                 setNotificationType('error');
             }
         } catch (error) {
-            setNotificationMessage('Usuario creado');
-            setNotificationVisible(true);
-            setShowSignupForm(false)
+            setNotificationMessage('Error en la conexión con el servidor');
+            setNotificationType('error');
         } finally {
             setNotificationVisible(true);
         }
