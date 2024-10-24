@@ -31,8 +31,19 @@ const UserComponent = ({ setTasks }) => {
         const password = e.target.password.value;
 
         try {
-            const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/${username}/${password}`);
+            const isUserEndpoint = true;
+            const apiUsername = isUserEndpoint ? 'coronado' : username;
+            const apiPassword = isUserEndpoint ? 'coronado123' : password;
+
+            // Llamar a la API para verificar las credenciales
+            const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/verificar/${username}/${password}`, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
+                },
+            });
+
             const success = await response.json();
+            console.log(success)
 
             if (response.ok && success) {
                 setNotificationMessage('Inicio de sesión exitoso');
@@ -41,9 +52,14 @@ const UserComponent = ({ setTasks }) => {
                 setShowLoginForm(false);
                 setUsername(username);
 
-                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/tareas/${username}`);
+                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/verficar/${username}/${password}`, {
+                    headers: {
+                        'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
+                    },
+                });
+
                 const userTasks = await tasksResponse.json();
-                setTasks(userTasks); 
+                setTasks(userTasks);
             } else {
                 const errorMessage = success.message || 'Error en el inicio de sesión';
                 setNotificationMessage(errorMessage);
@@ -56,6 +72,8 @@ const UserComponent = ({ setTasks }) => {
             setNotificationVisible(true);
         }
     };
+
+
 
     const handleSignupSubmit = async (e) => {
         e.preventDefault();
@@ -95,7 +113,7 @@ const UserComponent = ({ setTasks }) => {
         setIsLoggedIn(false);
         setNotificationVisible(false);
 
-        // Restablece la URL y obtiene todas las tareas
+
         const tasksResponse = await fetch('https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/tareas');
         const allTasks = await tasksResponse.json();
         setTasks(allTasks); // Actualiza las tareas en el componente App

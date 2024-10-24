@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Chart, registerables } from 'chart.js';
 
-// Registra todos los componentes necesarios
 Chart.register(...registerables);
 
 const AnaliticaGrafico = ({ tipo }) => {
@@ -30,9 +29,13 @@ const AnaliticaGrafico = ({ tipo }) => {
             grafico.destroy();
         }
 
-        // Limpiar el canvas manualmente
-        const ctx = ctxRef.current.getContext("2d");
-        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        // Limpiar el contenedor del canvas
+        ctxRef.current.innerHTML = '';
+
+        // Crear un nuevo canvas para el gráfico
+        const canvas = document.createElement('canvas');
+        ctxRef.current.appendChild(canvas); // Añadir el canvas al contenedor
+        const ctx = canvas.getContext("2d");
 
         let graficoDatos;
 
@@ -151,7 +154,7 @@ const AnaliticaGrafico = ({ tipo }) => {
         }
 
         const newGrafico = new Chart(ctx, graficoDatos);
-        setGrafico(newGrafico);  // Guarda el gráfico para destruirlo después
+        setGrafico(newGrafico);
     };
 
     useEffect(() => {
@@ -166,7 +169,7 @@ const AnaliticaGrafico = ({ tipo }) => {
     }, [tipo]);  // Solo actualiza cuando el tipo de gráfico cambia
 
     return (
-        <canvas ref={ctxRef} id="grafico" />
+        <div ref={ctxRef} style={{ position: 'relative', width: '100%', height: '400px' }} />
     );
 };
 

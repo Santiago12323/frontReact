@@ -100,8 +100,19 @@
 
 .close_button {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 10px; /* Posiciona el botón a 10px del borde superior */
+    right: 10px; /* Posiciona el botón a 10px del borde derecho */
+    z-index: 1; /* Asegura que esté por encima del contenido del modal */
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.close_button:hover {
+    background-color: darkred; /* Efecto hover para el botón */
 }
 
 .notification {
@@ -141,6 +152,7 @@
 }
 
 .modal-content-analitica {
+    position: relative;
     background-color: white;
     padding: 20px;
     border-radius: 8px;
@@ -148,6 +160,7 @@
     max-width: 600px; /* Ancho máximo */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
 
 
 
