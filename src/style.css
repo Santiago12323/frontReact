@@ -126,4 +126,28 @@
     color: #721c24;
 }
 
+/* AnaliticaModal.css */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Asegura que el modal esté por encima de otros elementos */
+}
+
+.modal-content-analitica {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 60%; /* Ancho del modal */
+    max-width: 600px; /* Ancho máximo */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 
