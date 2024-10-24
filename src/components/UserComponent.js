@@ -35,7 +35,7 @@ const UserComponent = ({ setTasks }) => {
             const apiUsername = isUserEndpoint ? 'coronado' : username;
             const apiPassword = isUserEndpoint ? 'coronado123' : password;
 
-            // Llamar a la API para verificar las credenciales
+            
             const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/verificar/${username}/${password}`, {
                 headers: {
                     'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
@@ -52,7 +52,7 @@ const UserComponent = ({ setTasks }) => {
                 setShowLoginForm(false);
                 setUsername(username);
 
-                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/verficar/${username}/${password}`, {
+                const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/tareas/${username}`, {
                     headers: {
                         'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
                     },
@@ -116,7 +116,7 @@ const UserComponent = ({ setTasks }) => {
 
         const tasksResponse = await fetch('https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/tareas');
         const allTasks = await tasksResponse.json();
-        setTasks(allTasks); // Actualiza las tareas en el componente App
+        setTasks(allTasks); 
     };
 
     return (
