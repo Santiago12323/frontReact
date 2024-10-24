@@ -15,7 +15,6 @@ const TaskTable = ({ tasks, deleteTask, editTask, toggleTaskStatus }) => {
                     <th scope="col">Estado</th>
                     <th scope="col">Actualizar</th>
                     <th scope="col">Borrar</th>
-
                 </tr>
                 </thead>
                 <tbody>
