@@ -1,6 +1,10 @@
 import React from 'react';
 
 const TaskTable = ({ tasks, deleteTask, editTask, toggleTaskStatus }) => {
+    if (!Array.isArray(tasks)) {
+        return <div>No hay tareas disponibles</div>;
+    }
+
     return (
         <div className="table-responsive mt-4">
             <table className="table table-striped table-bordered">
