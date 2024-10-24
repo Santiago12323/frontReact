@@ -81,13 +81,27 @@ const UserComponent = ({ setTasks }) => {
         const password = e.target.password.value;
 
         try {
+
+            const isUserEndpoint = true;
+            const apiUsername = isUserEndpoint ? 'coronado' : username;
+            const apiPassword = isUserEndpoint ? 'coronado123' : password;
+
+
+            const tasksResponse = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario/tareas/${username}`, {
+                headers: {
+                    'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
+                },
+            });
+
             const response = await fetch(`https://apptareas-f5gxfjabgwfxe2ed.canadacentral-01.azurewebsites.net/usuario`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', // Asegúrate de incluir el tipo de contenido
+                    'Authorization': 'Basic ' + btoa(`${apiUsername}:${apiPassword}`),
                 },
                 body: JSON.stringify({ nombre: username, contraseña: password }),
             });
+            
 
             const success = await response.json();
 
