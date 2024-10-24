@@ -48,6 +48,15 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
         resetForm();
     };
 
+    const handleTiempoPromedioChange = (e) => {
+        const value = e.target.value;
+
+        // Permitir solo números y un punto o coma
+        if (/^\d*([.,]?\d*)?$/.test(value) || value === '') {
+            setTiempoPromedio(value.replace(',', '.')); // Reemplazar coma por punto para mantener consistencia
+        }
+    };
+
     return (
         <>
             <form className="row g-3 justify-content-center" onSubmit={handleSubmit}>
@@ -95,11 +104,11 @@ const TaskForm = ({ addTask, updateTask, updateIndex, taskToUpdate }) => {
                 <div className="col-md-3">
                     <label>Tiempo Promedio (días)</label>
                     <input
-                        type="number"
+                        type="text" // Cambiado a text
                         className="form-control"
                         value={tiempoPromedio}
-                        onChange={(e) => setTiempoPromedio(Number(e.target.value))}
-                        min="1"
+                        onChange={handleTiempoPromedioChange} // Manejar cambios
+                        placeholder="Ej: 1.5"
                         required
                     />
                 </div>
